@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>倒數計時器</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e0f7fa; /* 淺藍色背景 */
+    margin: 0;
+  }
+  .timer-container {
+    background-color: #fff;
+    padding: 30px 50px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  #countdown {
+    font-size: 4em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .input-group {
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+  }
+  .input-group input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+  }
+  .buttons button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+  }
+  .buttons button:hover {
+    background-color: #45a049;
+  }
+  .buttons button#stopButton {
+    background-color: #f44336;
+  }
+  .buttons button#stopButton:hover {
+    background-color: #da190b;
+  }
+  .buttons button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<div class="timer-container">
+  <h1>倒數計時器</h1>
+  <div class="input-group">
+    <label for="minutes">分鐘:</label>
+    <input type="number" id="minutes" value="5" min="0">
+    <label for="seconds">秒數:</label>
+    <input type="number" id="seconds" value="0" min="0" max="59">
+  </div>
+  <div id="countdown">05:00</div>
+  <div class="buttons">
+    <button id="startButton">開始</button>
+    <button id="stopButton" disabled>停止</button>
+    <button id="resetButton">重置</button>
+  </div>
+</div>
+
+<script>
+  let countdownInterval;
+  let totalSeconds;
+  let isRunning = false;
+
+  const minutesInput = document.getElementById('minutes');
+  const secondsInput = document.getElementById('seconds');
+  const countdownDisplay = document.getElementById('countdown');
+  const startButton = document.getElementById('startButton');
+  const stopButton = document.getElementById('stopButton');
+  const resetButton = document.getElementById('resetButton');
+
+  function updateDisplay(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    countdownDisplay.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  function startTimer() {
+    if (isRunning) return;
+
+    const initialMinutes = parseInt(minutesInput.value, 10);
+    const initialSeconds = parseInt(secondsInput.value, 10);
+
+    totalSeconds = (initialMinutes * 60) + initialSeconds;
+
+    if (totalSeconds <= 0) {
+      alert("請輸入有效的時間！");
+      return;
+    }
+
+    isRunning = true;
+    startButton.disabled = true;
+    stopButton.disabled = false;
+    minutesInput.disabled = true;
+    secondsInput.disabled = true;
+
+    countdownInterval = setInterval(() => {
+      if (totalSeconds <= 0) {
+        clearInterval(countdownInterval);
+        countdownDisplay.textContent = "時間到！";
+        isRunning = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        minutesInput.disabled = false;
+        secondsInput.disabled = false;
+        return;
+      }
+      totalSeconds--;
+      updateDisplay(totalSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(countdownInterval);
+    isRunning = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    minutesInput.disabled = false;
+    secondsInput.disabled = false;
+  }
+
+  function resetTimer() {
+    stopTimer();
+    minutesInput.value = 5;
+    secondsInput.value = 0;
+    updateDisplay(300); // 5 minutes in seconds
+  }
+
+  startButton.addEventListener('click', startTimer);
+  stopButton.addEventListener('click', stopTimer);
+  resetButton.addEventListener('click', resetTimer);
+
+  // Initial display
+  resetTimer();
+</script>
+
+</body>
+</html>
